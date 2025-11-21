@@ -86,7 +86,7 @@ class OpsTest(parameterized.TestCase):
 
         dist = torch.rand(z, )
         dist /= dist.sum()
-        batch_sizes = (dist * m).to(torch.long)
+        batch_sizes = (dist * m * z).to(torch.long)
         error = m * z - batch_sizes.sum()
         batch_sizes[-1] += error
         assert batch_sizes.sum() == (m * z)
