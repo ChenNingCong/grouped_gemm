@@ -34,6 +34,9 @@ def _(a : torch.Tensor,
         batch_sizes : torch.Tensor, 
         trans_a : bool, 
         trans_b : bool) -> torch.Tensor:
+    assert a.is_contiguous()
+    assert b.is_contiguous()
+    assert c.is_contiguous()
     if not trans_a and trans_b:
         # forward pass
         assert a.ndim == 2
