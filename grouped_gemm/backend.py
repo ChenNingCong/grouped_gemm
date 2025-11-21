@@ -7,6 +7,9 @@ import torch
 # c++ operations.
 import grouped_gemm_backend as backend
 
+# register them intro graphs
+torch.compiler.allow_in_graph(backend.gmm_sm89)
+torch.compiler.allow_in_graph(backend.gmm)
 
 def _allocate_output(a, b, batch_sizes, trans_a, trans_b):
     assert not (trans_a and trans_b)
