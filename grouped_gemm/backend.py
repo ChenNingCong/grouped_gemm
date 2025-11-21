@@ -21,9 +21,20 @@ def _allocate_output(a, b, batch_sizes, trans_a, trans_b):
     )
     return torch.empty(*shape, device=a.device, dtype=a.dtype)
 
-def gmm(a, b, batch_sizes, trans_a=False, trans_b=False, c=None):
+# Assuming 'backend' and '_allocate_output' are available
+
+def gmm(a : torch.Tensor, b, batch_sizes, trans_a=False, trans_b=False, c=None):
+    gmm_func = backend.gmm
+
+    if a.is_cuda:
+        major, minor = torch.cuda.get_device_capability(a.get_device())
+        
+        if major == 8 and minor == 9:
+            gmm_func = backend.gmm_sm89
+
     if c is None:
         c = _allocate_output(a, b, batch_sizes, trans_a, trans_b)
-    backend.gmm(a, b, c, batch_sizes, trans_a, trans_b)
+    
+    gmm_func(a, b, c, batch_sizes, trans_a, trans_b)
+    
     return c
-
