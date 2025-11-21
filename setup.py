@@ -19,7 +19,8 @@ else:
 cwd = Path(os.path.dirname(os.path.abspath(__file__)))
 
 nvcc_flags = [
-    "-std=c++17",  # NOTE: CUTLASS requires c++17
+    "-std=c++17",  # NOTE: CUTLASS requires c++17,
+    "-O3",
 ]
 
 if device_capability:
@@ -33,7 +34,7 @@ if os.environ.get("GROUPED_GEMM_CUTLASS", "0") == "1":
 ext_modules = [
     CUDAExtension(
         "grouped_gemm_backend",
-        ["csrc/ops.cu", "csrc/grouped_gemm.cu"],
+        ["csrc/ops.cu", "csrc/grouped_gemm.cu", "csrc/grouped_gemm_sm89.cu"],
         include_dirs = [
             f"{cwd}/third_party/cutlass/include/",
             f"{cwd}/csrc"
