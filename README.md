@@ -1,3 +1,5 @@
+This is a modification of `https://github.com/tgale96/grouped_gemm` to Support L40S which has a much smaller share memory space than H100 and A100.
+ 
 # Grouped GEMM
 
 A lighweight library exposing grouped GEMM kernels in PyTorch.
