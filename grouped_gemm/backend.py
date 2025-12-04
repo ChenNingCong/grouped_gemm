@@ -16,7 +16,7 @@ def gmm_handler(a : torch.Tensor,
                 c : torch.Tensor, 
                 batch_sizes : torch.Tensor, 
                 trans_a : bool, 
-                trans_b : bool) -> torch.Tensor:
+                trans_b : bool) -> None:
     return backend.gmm(a, b, c, batch_sizes, trans_a, trans_b)
 
 @torch.library.custom_op("grouped_gemm_backend::gmm_sm89", mutates_args={"c"}, device_types="cuda")
@@ -25,7 +25,7 @@ def gmm_sm89_handler(a : torch.Tensor,
                 c : torch.Tensor, 
                 batch_sizes : torch.Tensor, 
                 trans_a : bool, 
-                trans_b : bool) -> torch.Tensor:
+                trans_b : bool) -> None:
     return backend.gmm_sm89(a, b, c, batch_sizes, trans_a, trans_b)
 
 def _(a : torch.Tensor, 
@@ -33,7 +33,7 @@ def _(a : torch.Tensor,
         c : torch.Tensor, 
         batch_sizes : torch.Tensor, 
         trans_a : bool, 
-        trans_b : bool) -> torch.Tensor:
+        trans_b : bool) -> None:
     assert a.is_contiguous()
     assert b.is_contiguous()
     assert c.is_contiguous()
@@ -42,7 +42,7 @@ def _(a : torch.Tensor,
         assert a.ndim == 2
         assert b.ndim == 3
         assert a.shape[-1] == b.shape[-1]
-        return torch.empty(a.shape[0], b.shape[1])
+        assert c.shape == (a.shape[0], b.shape[1])
     elif trans_a and not trans_b:
         # a : [num_tokens, hidden_out]
         # b : [num_tokens, hidden_in]
@@ -50,7 +50,7 @@ def _(a : torch.Tensor,
         assert a.ndim == 2
         assert b.ndim == 2
         assert a.shape[0] == b.shape[0]
-        return torch.empty(batch_sizes.shape[0], a.shape[-1], b.shape[-1])
+        assert c.shape == (batch_sizes.shape[0], a.shape[-1], b.shape[-1])
     elif not trans_a and not trans_b:
         # a : [num_tokens, hidden_out]
         # b : [num_expert, hidden_out, hidden_in]
@@ -58,7 +58,7 @@ def _(a : torch.Tensor,
         assert a.ndim == 2
         assert b.ndim == 3
         assert a.shape[1] == b.shape[1]
-        return torch.empty(a.shape[0], b.shape[-1])
+        assert c.shape == (a.shape[0], b.shape[-1])
     else:
         assert False
 
